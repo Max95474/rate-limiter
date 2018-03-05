@@ -9,15 +9,15 @@ func TestLimitFunc(t *testing.T) {
 	var calledTimes = 0
 	fn := Limit(func() {
 		calledTimes++
-	}, time.Second, 10)
+	}, time.Second, 0)
 	fn()
 	if calledTimes > 1 {
 		t.Fatal("Function called twice!")
 	}
-	time.Sleep(time.Millisecond * 500)
+	time.Sleep(time.Millisecond * 300)
 	fn()
 	if calledTimes > 1 {
-		t.Fatal("Function called twice!")
+		t.Fatal("Function called more than one time!")
 	}
 	time.Sleep(time.Second)
 	fn()
@@ -27,14 +27,24 @@ func TestLimitFunc(t *testing.T) {
 }
 
 func TestCalledTimes(t *testing.T) {
-	var calledTimes = 0
-	fn := Limit(func() {
-		calledTimes++
+	var calledTimesFirts, calledTimesSecond int
+	fn1 := Limit(func() {
+		calledTimesFirts++
 	}, time.Second, 5)
 	for i := 0; i < 10; i++ {
-		fn()
+		fn1()
 	}
-	if calledTimes > 5 {
+	if calledTimesFirts > 5 {
+		t.Fatal("Function called more than 5 times")
+	}
+	time.Sleep(time.Second)
+	fn2 := Limit(func() {
+		calledTimesSecond++
+	}, time.Second, 3)
+	for i := 0; i < 10; i++ {
+		fn2()
+	}
+	if calledTimesSecond > 3 {
 		t.Fatal("Function called more than 5 times")
 	}
 }
